@@ -1,3 +1,4 @@
+import fs from "fs";
 export class TodoEntity {
   public completed: boolean;
   public id: number;
@@ -35,7 +36,7 @@ export class TodoEntity {
     console.log({ object: todo });
     const hasValidData = this.hasValidData(todo);
     if (!hasValidData) {
-      throw new Error("Error de sintaxis");
+      fs.writeFileSync(`logs/my-log.log`, "");
     }
 
     return todo;
@@ -50,7 +51,7 @@ export class TodoEntity {
       origin,
     });
     if (!hasValidData) {
-      throw new Error("Error de sintasix");
+      fs.writeFileSync(`logs/my-log.log`, "");
     }
     const log = new TodoEntity({
       message,

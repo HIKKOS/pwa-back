@@ -21,27 +21,29 @@ export class FileSystemDatasource {
   };
 
   async saveLogs(todo: Todo): Promise<Todo> {
-    const todoAsJson = `${JSON.stringify(todo)}\n`;
+    const todoAsJson = `${JSON.stringify(todo)}%`;
     await fsp.appendFile(`${this.logPath}/my-log.log`, todoAsJson);
     return todo;
   }
   async deleteLogById(id: number): Promise<void> {
     const logs = await this.getLogsFromFile(this.logPath);
     const newLogs = logs.filter((log) => log.id !== id);
-    const logsAsString = newLogs.map((log) => JSON.stringify(log)).join("\n");
-    await fsp.writeFile(`${this.logPath}/my-log.log`, logsAsString);
+    fs.writeFileSync(`${this.logPath}/my-log.log`, "");
+    newLogs.forEach(async (log) => await this.saveLogs(log));
   }
 
   async updateLogById(id: number, todo: Todo): Promise<Todo> {
     const logs = await this.getLogsFromFile(this.logPath);
-    const newLogs = logs.map((log) => {
+    for (const log of logs) {
       if (log.id === id) {
-        return todo;
+        log.completed = todo.completed;
+        log.description = todo.description;
+        log.title = todo.title;
       }
-      return log;
-    });
-    const logsAsString = newLogs.map((log) => JSON.stringify(log)).join("\n");
-    await fsp.writeFile(`${this.logPath}/my-log.log`, logsAsString);
+    }
+    fs.writeFileSync(`${this.logPath}/my-log.log`, "");
+    logs.forEach(async (log) => await this.saveLogs(log));
+
     return todo;
   }
 
@@ -52,7 +54,7 @@ export class FileSystemDatasource {
     const content = await fsp.readFile(`${this.logPath}/my-log.log`, "utf-8");
     if (content == "") return [];
     let todos: Todo[] = [];
-    const listString = content.split("\n");
+    const listString = content.split("%");
     for (const string of listString) {
       if (string == "") {
         continue;
