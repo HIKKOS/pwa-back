@@ -1,0 +1,8 @@
+node_modules
+build
+src/prisma/migrations
+uploads/*
+src/uploads
+package-lock.json
+# Keep environment variables out of version control
+.env
